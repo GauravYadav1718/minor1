@@ -44,7 +44,7 @@ if not GOOGLE_PLACES_API_KEY:
 
 # Initialize Flask App
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": ["https://minor1-xi.vercel.app"]}})
 
 # Global state
 current_location = None
@@ -574,4 +574,4 @@ if __name__ == "__main__":
     print(f"🌐 Server: http://localhost:8000")
     print("=" * 60 + "\n")
     
-    app.run(host="0.0.0.0", port=8000, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=8000)
