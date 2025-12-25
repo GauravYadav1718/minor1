@@ -6,3 +6,4 @@ pypdf
 pydub
 SpeechRecognition
 gTTS
+gunicorn
