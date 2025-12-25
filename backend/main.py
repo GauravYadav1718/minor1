@@ -574,4 +574,4 @@ if __name__ == "__main__":
     print(f"🌐 Server: http://localhost:8000")
     print("=" * 60 + "\n")
     
-    app.run(host="0.0.0.0", port=8000)
+     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
