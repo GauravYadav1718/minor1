@@ -70,51 +70,67 @@ export default function WanderGuideApp() {
     }
   };
 
-  const sendMessage = async (message) => {
-    if (!message.trim()) return;
+const sendMessage = async (message) => {
+  if (!message.trim()) return;
 
-    const userMessage = { role: 'user', content: message };
-    setChatHistory(prev => [...prev, userMessage]);
-    setCurrentMessage('');
-    setIsLoading(true);
+  const userMessage = { role: 'user', content: message };
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: message,
-          history: chatHistory.map(msg => [msg.content, ''])
-        })
-      });
+  // show user message immediately
+  setChatHistory(prev => [...prev, userMessage]);
+  setCurrentMessage('');
+  setIsLoading(true);
 
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error);
+  try {
+    // build proper [user, assistant] history for backend
+    const formattedHistory = chatHistory.reduce((acc, msg, index, arr) => {
+      if (msg.role === 'user') {
+        const assistantReply =
+          arr[index + 1]?.role === 'assistant'
+            ? arr[index + 1].content
+            : '';
+        acc.push([msg.content, assistantReply]);
       }
+      return acc;
+    }, []);
 
-      const botMessage = {
-        role: 'assistant',
-        content: data.reply,
-      };
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: message.trim(),
+        history: formattedHistory
+      })
+    });
 
-      setChatHistory(prev => [...prev, botMessage]);
+    const data = await response.json();
 
-      if (data.location_detected) {
-        setCurrentLocation(data.location_detected);
-      }
-    } catch (error) {
-      console.error('Chat error:', error);
-      setChatHistory(prev => [...prev, {
+    if (!response.ok || data.error) {
+      throw new Error(data.error || 'Chat failed');
+    }
+
+    setChatHistory(prev => [
+      ...prev,
+      { role: 'assistant', content: data.reply }
+    ]);
+
+    if (data.location_detected) {
+      setCurrentLocation(data.location_detected);
+    }
+
+  } catch (error) {
+    setChatHistory(prev => [
+      ...prev,
+      {
         role: 'assistant',
         content: `Error: ${error.message}`,
         isError: true
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      }
+    ]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const setLocation = async (location) => {
     if (!location.trim()) return;
