@@ -324,22 +324,26 @@ def health_check():
 @app.route("/api/chat", methods=["POST"])
 def api_chat():
     try:
-        data = request.json
-        user_message = data.get("message", "").strip()
+        data = request.get_json(silent=True) or {}
+
+        user_message = str(data.get("message", "")).strip()
         history = data.get("history", [])
-        
+
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
-        
+
         print(f"💬 User: {user_message}")
+
         response = generate_chat_response(history, user_message)
+
         print(f"🤖 Bot: {response['reply'][:100]}...")
-        
+
         return jsonify(response)
-        
+
     except Exception as e:
         print(f"❌ Chat error: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @app.route("/api/voice/transcribe", methods=["POST"])
 def api_transcribe():
