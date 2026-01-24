@@ -44,7 +44,8 @@ if not GOOGLE_PLACES_API_KEY:
 
 # Initialize Flask App
 app = Flask(__name__)
-CORS(app, origins=["https://minor1-xi.vercel.app"])
+CORS(app, resources={r"/api/*": {"origins": ["https://minor1-xi.vercel.app"]}})
+
 
 
 # Global state
