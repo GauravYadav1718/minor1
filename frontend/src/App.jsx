@@ -7,7 +7,7 @@ import { useTheme } from './ThemeContext';
 import Topbar from './Topbar';
 import Sidebar from './Sidebar';
 
-const API_BASE_URL = 'https://minor1-pcja.onrender.com/api/';
+const API_BASE_URL = 'https://minor1-pcja.onrender.com/api';
 
 export default function WanderGuideApp() {
   const [searchQuery, setSearchQuery] = useState('');
